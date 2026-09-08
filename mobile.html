@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Two Owls Coffee — mobile dashboard demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1F2E3D; --paper:#FAF6ED; --paper-dim:#F1EBDB;
+    --gold:#C99A3E; --gold-dark:#8A6A26;
+    --sage:#5C7C60; --sage-bg:#E7EEE3;
+    --brick:#A8452F; --brick-bg:#F4E3DD;
+    --amber:#B8863B; --amber-bg:#F3E7CF;
+    --charcoal:#3A3F44; --line:#DCD3BE;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper-dim);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+
+  .stage{max-width:920px;margin:0 auto;padding:40px 20px 70px;}
+  .intro{max-width:640px;margin-bottom:28px;}
+  .intro .kicker{font-family:'Space Mono',monospace;font-size:12px;color:var(--gold-dark);margin:0 0 8px;}
+  .intro h1{font-family:'Fraunces',serif;font-weight:500;font-size:28px;line-height:1.2;margin:0 0 10px;}
+  .intro p{font-size:14.5px;line-height:1.6;color:var(--charcoal);margin:0;}
+
+  .phone-wrap{display:flex;justify-content:center;}
+  .phone{
+    width:380px; max-width:100%;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:28px;
+    box-shadow:0 20px 40px rgba(31,46,61,0.18);
+    overflow:hidden;
+  }
+  .phone-notch{height:22px;background:var(--ink);position:relative;}
+  .phone-notch::after{content:"";position:absolute;left:50%;top:6px;transform:translateX(-50%);width:70px;height:8px;background:#0F1720;border-radius:6px;}
+
+  .app-bar{
+    background:var(--ink); color:#fff; padding:14px 18px 16px;
+  }
+  .app-bar .store{font-family:'Fraunces',serif;font-weight:600;font-size:16px;}
+  .app-bar .date{font-family:'Space Mono',monospace;font-size:10.5px;color:#B9C2CC;margin-top:2px;}
+
+  .screen{padding:16px 16px 8px;min-height:520px;}
+  .tag{
+    display:inline-block; font-family:'Space Mono',monospace; font-size:9.5px;
+    padding:3px 7px; border-radius:3px; margin-bottom:10px;
+  }
+  .tag.easy{background:var(--sage-bg);color:var(--sage);}
+  .tag.medium{background:var(--amber-bg);color:var(--amber);}
+  .tag.hard{background:var(--brick-bg);color:var(--brick);}
+
+  h2.screen-title{font-family:'Fraunces',serif;font-weight:600;font-size:19px;margin:0 0 4px;}
+  .screen-sub{font-size:12px;color:var(--charcoal);margin:0 0 16px;}
+
+  .kpi-strip{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .kpi-card{background:#fff;border:1px solid var(--line);padding:12px 12px 10px;border-radius:8px;}
+  .kpi-card .label{font-size:11px;color:var(--charcoal);margin:0 0 4px;}
+  .kpi-card .val{font-family:'Fraunces',serif;font-weight:600;font-size:20px;margin:0;}
+  .kpi-card .sub{font-size:10.5px;margin-top:3px;}
+  .sub.up{color:var(--sage);} .sub.down{color:var(--brick);}
+
+  .callout{
+    background:var(--amber-bg); border-radius:8px; padding:12px 13px;
+    font-size:12.5px; line-height:1.55; color:#5C4315; margin-bottom:16px;
+  }
+  .callout b{color:var(--gold-dark);}
+
+  .list-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 13px;margin-bottom:16px;}
+  .list-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--paper-dim);gap:10px;}
+  .list-row:last-child{border-bottom:none;}
+  .list-row .name{font-size:13px;font-weight:500;}
+  .list-row .meta{font-size:11px;color:var(--charcoal);margin-top:2px;}
+  .pill{font-family:'Space Mono',monospace;font-size:10px;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+  .pill.low{background:var(--brick-bg);color:var(--brick);}
+  .pill.ok{background:var(--sage-bg);color:var(--sage);}
+  .pill.watch{background:var(--amber-bg);color:var(--amber);}
+
+  .reorder-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:13px;margin-bottom:12px;}
+  .reorder-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+  .reorder-top .item{font-size:13.5px;font-weight:600;}
+  .reorder-top .qty{font-family:'Space Mono',monospace;font-size:12px;color:var(--gold-dark);}
+  .reorder-meta{font-size:11.5px;color:var(--charcoal);line-height:1.5;margin-bottom:10px;}
+  .btn{
+    display:inline-block; width:100%; text-align:center; padding:9px 0;
+    background:var(--ink); color:#fff; border-radius:6px; font-size:12.5px; font-weight:600;
+    font-family:'Inter',sans-serif;
+  }
+
+  .vendor-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:13px;margin-bottom:12px;}
+  .vendor-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .vendor-top .name{font-size:13.5px;font-weight:600;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px;}
+  .dot.green{background:var(--sage);} .dot.amber{background:var(--amber);} .dot.red{background:var(--brick);}
+  .vendor-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+  .vstat{background:var(--paper-dim);border-radius:6px;padding:6px 4px;text-align:center;}
+  .vstat .n{font-family:'Fraunces',serif;font-weight:600;font-size:14px;}
+  .vstat .l{font-size:9px;color:var(--charcoal);margin-top:1px;}
+  .vendor-note{font-size:11.5px;color:var(--charcoal);line-height:1.5;}
+
+  .tabbar{
+    display:flex; border-top:1px solid var(--line); background:#fff;
+  }
+  .tab{
+    flex:1; text-align:center; padding:10px 4px 12px; cursor:pointer;
+    font-size:10.5px; color:var(--charcoal); font-weight:500;
+    border-top:2px solid transparent;
+  }
+  .tab .ic{display:block;font-size:17px;margin-bottom:2px;}
+  .tab.active{color:var(--ink); border-top-color:var(--gold); font-weight:700;}
+
+  .legend{max-width:640px;margin:26px auto 0;font-size:12px;color:var(--charcoal);line-height:1.7;}
+  .legend .tag{margin-right:6px;}
+
+  .screen-panel{display:none;}
+  .screen-panel.active{display:block;}
+
+  @media (max-width:420px){ .stage{padding:20px 12px 40px;} }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <div class="intro">
+    <p class="kicker">sample client deliverable — cafe vertical, illustrative data</p>
+    <h1>Two Owls Coffee, on the owner's phone</h1>
+    <p>Four tabs, nothing to log into on a desktop, nothing to interpret. Each tab is tagged with what data it actually needs from you — that's the real scoping question, not the design.</p>
+  </div>
+
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="app-bar">
+        <div class="store">Two Owls Coffee</div>
+        <div class="date">Tue 9 Sep · updated 6:02am</div>
+      </div>
+
+      <div class="screen">
+
+        <!-- SALES & PROFIT -->
+        <div class="screen-panel active" id="panel-sales">
+          <span class="tag easy">needs: POS sales export</span>
+          <span class="tag medium">+ cost-per-item for profit</span>
+          <h2 class="screen-title">Sales &amp; Profit</h2>
+          <p class="screen-sub">Yesterday</p>
+          <div class="kpi-strip">
+            <div class="kpi-card"><p class="label">Revenue</p><p class="val">$1,284</p><p class="sub up">↑ 9% vs last Tue</p></div>
+            <div class="kpi-card"><p class="label">Gross profit</p><p class="val">$741</p><p class="sub up">57.7% margin</p></div>
+          </div>
+          <div class="callout"><b>Your best seller isn't your best earner.</b> Flat whites are the #1 seller by volume, but oat-milk lattes carry an 11pt higher margin. Small menu-board nudge could shift mix.</div>
+          <div class="list-card">
+            <div class="list-row"><div><div class="name">Flat white</div><div class="meta">142 sold · 41% margin</div></div><span class="pill watch">top volume</span></div>
+            <div class="list-row"><div><div class="name">Oat-milk latte</div><div class="meta">61 sold · 52% margin</div></div><span class="pill ok">top margin</span></div>
+            <div class="list-row"><div><div class="name">Almond croissant</div><div class="meta">38 sold · 34% margin</div></div></div>
+          </div>
+        </div>
+
+        <!-- INVENTORY -->
+        <div class="screen-panel" id="panel-stock">
+          <span class="tag medium">needs: stock/inventory export</span>
+          <h2 class="screen-title">Inventory</h2>
+          <p class="screen-sub">Key ingredients, days remaining at current sales pace</p>
+          <div class="list-card">
+            <div class="list-row"><div><div class="name">Coffee beans (house blend)</div><div class="meta">18kg on hand</div></div><span class="pill ok">9 days</span></div>
+            <div class="list-row"><div><div class="name">Whole milk</div><div class="meta">32L on hand</div></div><span class="pill low">1.5 days</span></div>
+            <div class="list-row"><div><div class="name">Oat milk</div><div class="meta">14L on hand</div></div><span class="pill watch">3 days</span></div>
+            <div class="list-row"><div><div class="name">Sourdough loaves</div><div class="meta">6 units</div></div><span class="pill low">1 day</span></div>
+            <div class="list-row"><div><div class="name">Almond croissants (frozen)</div><div class="meta">40 units</div></div><span class="pill ok">8 days</span></div>
+          </div>
+          <div class="callout"><b>Milk and bread are the pinch points</b> — both under 2 days. Everything else has breathing room.</div>
+        </div>
+
+        <!-- REPLENISHMENT -->
+        <div class="screen-panel" id="panel-reorder">
+          <span class="tag easy">derived — no new data, just math</span>
+          <h2 class="screen-title">Replenishment</h2>
+          <p class="screen-sub">Suggested orders, based on stock + sales pace</p>
+          <div class="reorder-card">
+            <div class="reorder-top"><span class="item">Whole milk</span><span class="qty">40L</span></div>
+            <div class="reorder-meta">Dairy Co. · order today, usual 1-day lead time</div>
+            <a class="btn">Send order</a>
+          </div>
+          <div class="reorder-card">
+            <div class="reorder-top"><span class="item">Sourdough loaves</span><span class="qty">18 units</span></div>
+            <div class="reorder-meta">Riverbank Bakery · order today for tomorrow AM delivery</div>
+            <a class="btn">Send order</a>
+          </div>
+          <div class="reorder-card">
+            <div class="reorder-top"><span class="item">Oat milk</span><span class="qty">24L</span></div>
+            <div class="reorder-meta">Dairy Co. · order by tomorrow</div>
+            <a class="btn">Send order</a>
+          </div>
+        </div>
+
+        <!-- VENDOR PERFORMANCE -->
+        <div class="screen-panel" id="panel-vendor">
+          <span class="tag hard">needs: manual delivery log (hardest to automate)</span>
+          <h2 class="screen-title">Vendor performance</h2>
+          <p class="screen-sub">Last 90 days</p>
+          <div class="vendor-card">
+            <div class="vendor-top"><span class="name"><span class="dot green"></span>Highland Bean Roasters</span><span class="pill ok">reliable</span></div>
+            <div class="vendor-stats">
+              <div class="vstat"><div class="n">98%</div><div class="l">on-time</div></div>
+              <div class="vstat"><div class="n">0</div><div class="l">quality flags</div></div>
+              <div class="vstat"><div class="n">→</div><div class="l">price trend</div></div>
+            </div>
+            <div class="vendor-note">Consistent for 6 months straight. No action needed.</div>
+          </div>
+          <div class="vendor-card">
+            <div class="vendor-top"><span class="name"><span class="dot amber"></span>Dairy Co.</span><span class="pill watch">watch</span></div>
+            <div class="vendor-stats">
+              <div class="vstat"><div class="n">83%</div><div class="l">on-time</div></div>
+              <div class="vstat"><div class="n">2</div><div class="l">quality flags</div></div>
+              <div class="vstat"><div class="n">↑</div><div class="l">price trend</div></div>
+            </div>
+            <div class="vendor-note">Two late deliveries this month plus a price rise — worth a call before the next contract renewal.</div>
+          </div>
+          <div class="vendor-card">
+            <div class="vendor-top"><span class="name"><span class="dot red"></span>Riverbank Bakery</span><span class="pill low">at risk</span></div>
+            <div class="vendor-stats">
+              <div class="vstat"><div class="n">61%</div><div class="l">on-time</div></div>
+              <div class="vstat"><div class="n">4</div><div class="l">quality flags</div></div>
+              <div class="vstat"><div class="n">↑</div><div class="l">price trend</div></div>
+            </div>
+            <div class="vendor-note">Missed delivery windows caused the bread shortage flagged in Inventory. Worth comparing quotes from a backup supplier.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="tabbar">
+        <div class="tab active" data-panel="panel-sales"><span class="ic">◐</span>Sales</div>
+        <div class="tab" data-panel="panel-stock"><span class="ic">▤</span>Stock</div>
+        <div class="tab" data-panel="panel-reorder"><span class="ic">↻</span>Reorder</div>
+        <div class="tab" data-panel="panel-vendor"><span class="ic">✓</span>Vendors</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="tag easy">green tag</span> = comes straight from data the client already has &nbsp;·&nbsp;
+    <span class="tag medium">amber tag</span> = needs one extra file or field from the client &nbsp;·&nbsp;
+    <span class="tag hard">red tag</span> = needs a habit change from the client (logging deliveries) before it's real data, not a demo.
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+      document.querySelectorAll('.screen-panel').forEach(function(p){ p.classList.remove('active'); });
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.panel).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
